@@ -292,8 +292,8 @@ button.on, button.on:hover { background: var(--ink); color: var(--paper); }
 <body>
 <main>
   <header>
-    <h1>Belajar Nihongo</h1>
-    <p class="mu">Materi buku pelajaran Bab 1 sampai 24</p>
+    <h1>Nihongo Go!</h1>
+    <p class="mu">Belajar Bahasa Jepang Lebih Interaktif, Cepat, dan Menyenangkan</p>
   </header>
   <div id="bar" hidden>
     <button id="back" onclick="goBack()">Kembali ke menu</button>
@@ -315,7 +315,7 @@ button.on, button.on:hover { background: var(--ink); color: var(--paper); }
    ========================================================= */
 const CREDIT_LOGOS = [
   { src: "img/ub-logo-small.png", alt: "Logo Universitas Brawijaya", name: "Universitas Brawijaya" },
-  { src: "img/images.png",        alt: "Logo SMA 5 Malang",          name: "SMA 5 Malang" },
+  { src: "img/images.png",        alt: "Logo SMA 5 Malang",          name: "SMAN 5 Malang" },
 ];
 
 /* =========================================================
@@ -1654,9 +1654,7 @@ function renderAbout() {
   $("v").innerHTML = `
     <div class="box about">
       <h2>Tentang website ini</h2>
-      <p>Materi website ini dibuat dari buku pelajaran bahasa Jepang <b>Nihongo Kira-Kira</b>
-         untuk kelas 10 dan 11 SMA, dari Bab ${first.no} 「${first.title}」
-         sampai Bab ${last.no} 「${last.title}」.</p>
+      <p>Nihongo Go! adalah media pembelajaran digital interaktif yang dirancang khusus untuk siswa SMA kelas 10 dan 11. Mengacu pada materi buku Nihongo Kira Kira, website ini menghadirkan pengalaman belajar bahasa Jepang yang seru melalui kombinasi materi, kuis interaktif, dan gim edukatif.</p>
 
       <div class="credit">
         ${CREDIT_LOGOS.map(l => `
