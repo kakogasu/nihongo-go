@@ -72,6 +72,14 @@ h1::after {            /* coretan stabilo, satu kali saat halaman dibuka */
   animation: swipe .7s .15s ease-out both;
 }
 header p { margin: 4px 0 0; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.hlogos { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-top: 2px; }
+.hlogos img, .hlogos .ph {
+  display: block; width: 46px; height: 46px; object-fit: contain;
+  background: #fff; border: 1.5px solid var(--ink); border-radius: 8px; padding: 3px;
+}
+.hlogos .ph { display: flex; align-items: center; justify-content: center; border-style: dashed; color: var(--mute); font-size: 10px; }
+@media (max-width: 420px) { .hlogos img, .hlogos .ph { width: 38px; height: 38px; } h1 { font-size: 30px; } }
 .credit { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin: 20px 0; }
 .credit figure { margin: 0; width: 130px; text-align: center; }
 .credit img, .credit .ph { display: block; width: 88px; height: 88px; margin: 0 auto 8px; }
@@ -302,8 +310,11 @@ button.on, button.on:hover { background: var(--ink); color: var(--paper); }
 <body>
 <main>
   <header>
-    <h1>Nihongo Go!</h1>
-    <p class="mu">Belajar Bahasa Jepang Lebih Interaktif, Cepat, dan Menyenangkan</p>
+    <div class="hd-text">
+      <h1>Nihongo Go!</h1>
+      <p class="mu">Belajar Bahasa Jepang Lebih Interaktif, Cepat, dan Menyenangkan</p>
+    </div>
+    <div class="hlogos" id="hlogos"></div>
   </header>
   <div id="bar" hidden>
     <button id="back" onclick="goBack()">Kembali ke menu</button>
@@ -327,6 +338,10 @@ const CREDIT_LOGOS = [
   { src: "img/ub-logo-small.png", alt: "Logo Universitas Brawijaya", name: "Universitas Brawijaya" },
   { src: "img/images.png",        alt: "Logo SMA 5 Malang",          name: "SMAN 5 Malang" },
 ];
+/* Logo yang sama tampil juga di kanan atas header (memakai CREDIT_LOGOS di atas) */
+document.getElementById("hlogos").innerHTML = CREDIT_LOGOS.map(l => l.src
+  ? `<img src="${l.src}" alt="${l.alt}" title="${l.name}" onerror="this.outerHTML='<div class=&quot;ph&quot;>Logo</div>'">`
+  : `<div class="ph">Logo</div>`).join("");
 
 /* =========================================================
    1. DATA MATERI
@@ -407,6 +422,102 @@ const PRICE_TABLE_HTML = `
   </table>
   <p class="mu">Menanyakan harga: 「いくら ですか」. Menjawab: angka + ルピア / えん + です.</p>
 </div>`;
+
+/* ---------- Tabel tambahan per bab (Bunpou) ---------- */
+/* sel: "kana|romaji"; awalan "!" = sel kuning (bacaan khusus); awalan "<" = rata kiri */
+const ntCell = c => {
+  const irregular = c[0] === "!", left = c[0] === "<";
+  const [k, r] = (irregular || left ? c.slice(1) : c).split("|");
+  const cls = irregular ? ' class="irr"' : left ? ' class="l"' : "";
+  return `<td${cls}>${k}${r ? `<small>${r}</small>` : ""}</td>`;
+};
+const ntTable = (head, rows) => `<table class="nt"><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map(ntCell).join("")}</tr>`).join("")}</table>`;
+
+const FAMILY_TABLE_HTML = `
+<div class="tw">
+  <h4>Nama anggota keluarga</h4>
+  ${ntTable(["Anggota", "Keluarga sendiri (merendah)", "Keluarga orang lain (hormat)"], [
+    ["<Keluarga", "かぞく|kazoku", "ごかぞく|go-kazoku"],
+    ["<Ayah", "ちち|chichi", "おとうさん|otousan"],
+    ["<Ibu", "はは|haha", "おかあさん|okaasan"],
+    ["<Kakak laki-laki", "あに|ani", "おにいさん|oniisan"],
+    ["<Kakak perempuan", "あね|ane", "おねえさん|oneesan"],
+    ["<Adik laki-laki", "おとうと|otouto", "おとうとさん|otoutosan"],
+    ["<Adik perempuan", "いもうと|imouto", "いもうとさん|imoutosan"],
+    ["<Kakek", "そふ|sofu", "おじいさん|ojiisan"],
+    ["<Nenek", "そぼ|sobo", "おばあさん|obaasan"],
+    ["<Orang tua", "りょうしん|ryoushin", "ごりょうしん|go-ryoushin"],
+    ["<Kakak-adik", "きょうだい|kyoudai", "ごきょうだい|go-kyoudai"],
+  ])}
+  <p class="mu">Saat bercerita tentang keluarga sendiri kepada orang lain, pakai kolom <b>merendah</b> (わたし の <b>ちち</b>). Saat membicarakan keluarga orang lain, atau memanggil anggota keluarga sendiri secara langsung, pakai kolom <b>hormat</b> (ともだち の <b>おとうさん</b>).</p>
+</div>`;
+
+const NUMBER_TABLE_HTML = `
+<div class="tw">
+  <h4>1. Angka dasar</h4>
+  ${ntTable(["Angka", "Bacaan", "Angka", "Bacaan"], [
+    ["1","いち|ichi","6","ろく|roku"],
+    ["2","に|ni","7","なな / しち|nana / shichi"],
+    ["3","さん|san","8","はち|hachi"],
+    ["4","よん / し|yon / shi","9","きゅう / く|kyuu / ku"],
+    ["5","ご|go","10","じゅう|juu"],
+  ])}
+  <p class="mu">0 dibaca <b>ゼロ</b> atau <b>れい</b>.</p>
+  <h4>2. Angka 11 ke atas</h4>
+  ${ntTable(["Angka", "Cara membaca", "Contoh"], [
+    ["11–19", "<じゅう + angka satuan", "11 じゅういち, 13 じゅうさん"],
+    ["20, 30, …", "<angka satuan + じゅう", "20 にじゅう, 30 さんじゅう"],
+    ["21–99", "<puluhan + satuan", "23 にじゅうさん, 45 よんじゅうご"],
+    ["100", "<ひゃく", "100 ひゃく"],
+  ])}
+  <h4>3. Bulan: angka + がつ</h4>
+  ${ntTable(["Bulan ke", "Bacaan", "Bulan ke", "Bacaan"], [
+    ["1","いちがつ|ichi-gatsu","7","!しちがつ|shichi-gatsu"],
+    ["2","にがつ|ni-gatsu","8","はちがつ|hachi-gatsu"],
+    ["3","さんがつ|san-gatsu","9","!くがつ|ku-gatsu"],
+    ["4","!しがつ|shi-gatsu","10","じゅうがつ|juu-gatsu"],
+    ["5","ごがつ|go-gatsu","11","じゅういちがつ|juuichi-gatsu"],
+    ["6","ろくがつ|roku-gatsu","12","じゅうにがつ|juuni-gatsu"],
+  ])}
+  <p class="mu">Kuning = pengecualian: 4 bulan <b>し</b>がつ (bukan よんがつ), 7 <b>しち</b>がつ, 9 <b>く</b>がつ. Tanya: なんがつ ですか。</p>
+  <h4>4. Tanggal: angka + にち</h4>
+  ${ntTable(["Tanggal", "Bacaan", "Tanggal", "Bacaan"], [
+    ["1","!ついたち|tsuitachi","6","!むいか|muika"],
+    ["2","!ふつか|futsuka","7","!なのか|nanoka"],
+    ["3","!みっか|mikka","8","!ようか|youka"],
+    ["4","!よっか|yokka","9","!ここのか|kokonoka"],
+    ["5","!いつか|itsuka","10","!とおか|tooka"],
+    ["14","!じゅうよっか|juuyokka","20","!はつか|hatsuka"],
+    ["24","!にじゅうよっか|nijuuyokka","13","じゅうさんにち|juu-san-nichi"],
+    ["23","にじゅうさんにち|ni-juu-san-nichi","30","さんじゅうにち|san-juu-nichi"],
+  ])}
+  <p class="mu">Kuning = bacaan khusus yang harus dihafal. Tanggal lainnya = angka + にち (17 じゅう<b>しち</b>にち, 19 じゅう<b>く</b>にち). Tanya: なんにち ですか。</p>
+</div>`;
+
+const TIME_TABLE_HTML = `
+<div class="tw">
+  <h4>1. Jam: angka + じ</h4>
+  ${ntTable(["Jam", "Bacaan", "Jam", "Bacaan"], [
+    ["1","いちじ|ichi-ji","7","!しちじ|shichi-ji"],
+    ["2","にじ|ni-ji","8","はちじ|hachi-ji"],
+    ["3","さんじ|san-ji","9","!くじ|ku-ji"],
+    ["4","!よじ|yo-ji","10","じゅうじ|juu-ji"],
+    ["5","ごじ|go-ji","11","じゅういちじ|juuichi-ji"],
+    ["6","ろくじ|roku-ji","12","じゅうにじ|juuni-ji"],
+  ])}
+  <p class="mu">Kuning = pengecualian: 4 jam dibaca <b>よ</b>じ, 7 <b>しち</b>じ, 9 <b>く</b>じ. Tanya: なんじ ですか。Lama waktu memakai じかん: <b>よ</b>じかん (4 jam), <b>く</b>じかん (9 jam).</p>
+  <h4>2. Menit: angka + ふん / ぷん</h4>
+  ${ntTable(["Menit", "Bacaan", "Menit", "Bacaan"], [
+    ["1","!いっぷん|ippun","6","!ろっぷん|roppun"],
+    ["2","にふん|nifun","7","ななふん|nanafun"],
+    ["3","!さんぷん|sanpun","8","!はっぷん|happun"],
+    ["4","!よんぷん|yonpun","9","きゅうふん|kyuufun"],
+    ["5","ごふん|gofun","10","!じゅっぷん|juppun"],
+    ["15","じゅうごふん|juu-gofun","30","!さんじゅっぷん|sanjuppun (= はん)"],
+  ])}
+  <p class="mu">Kuning = berakhiran <b>ぷん</b> (kadang dengan っ kecil). Menit lainnya berakhiran <b>ふん</b>. Tanya: なんぷん ですか。</p>
+</div>`;
+const EXTRA_TABLES = { 3: NUMBER_TABLE_HTML, 4: FAMILY_TABLE_HTML, 22: TIME_TABLE_HTML };
 
 /* Kamus arti per kata: "kata=arti" dipisah titik koma */
 const GLOSSARY = Object.fromEntries(`
@@ -988,7 +1099,7 @@ function renderGrammar() {
     <div class="box" style="margin-bottom:12px">
       <b>Bab ${c.no}: ${c.title}</b><div class="mu">${c.titleId}</div>
       <div class="ex">${c.grammar}</div>
-      ${c.price ? PRICE_TABLE_HTML : ""}
+      ${c.price ? PRICE_TABLE_HTML : ""}${EXTRA_TABLES[c.no] || ""}
       ${c.sentences.map(s => `
         <p><span class="jp" style="font-size:20px">${s.jpHtml}</span><br>
         <span class="ro">${s.romajiHtml}</span><br>${s.meaning}</p>`).join("")}
